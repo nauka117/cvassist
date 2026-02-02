@@ -1,49 +1,52 @@
-import os
-import requests
-from dotenv import load_dotenv
+import sys
+from typing import NoReturn
 
-load_dotenv()
+from cvassist.application.services.api_service import ApiService
+from cvassist.domain.exceptions import ConfigurationError
+from cvassist.infrastructure.cli.commands import CliCommands
+from cvassist.infrastructure.config.env_config import EnvConfigProvider
+from cvassist.infrastructure.gateways.openrouter_gateway import OpenRouterGateway
 
-def check_openrouter_connection():
-    api_key = os.getenv("OPENROUTER_API_KEY")
 
-    if not api_key:
-        print("Error: OPENROUTER_API_KEY environment variable not set.")
-        return False
+def main() -> int:
+    try:
 
-    url = "https://openrouter.ai/api/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "openai/gpt-3.5-turbo",
-        "messages": [{"role": "user", "content": "Hello, this is a test message."}]
-    }
+        config_provider = EnvConfigProvider()
+        api_gateway = OpenRouterGateway()
 
-    print("Sending request to OpenRouter API...")
-    response = requests.post(url, headers=headers, json=payload)
+        api_service = ApiService(
+            api_gateway=api_gateway,
+            config_provider=config_provider
+        )
 
-    if response.status_code == 200:
-        print("✅ Success! API is working correctly.")
-        data = response.json()
-        if "choices" in data and len(data["choices"]) > 0:
-            message_content = data["choices"][0]["message"]["content"]
-            print(f"Response from API: {message_content}")
-        return True
-    else:
-        print(f"❌ Error: {response.status_code}")
-        print(f"Response: {response.text}")
-        return False
+        cli_commands = CliCommands(api_service)
 
-def main():
-    print("Testing OpenRouter API connection...")
-    success = check_openrouter_connection()
+        print("Testing OpenRouter API connection...")
+        result = cli_commands.test_connection()
 
-    if success:
-        print("\n🎉 OpenRouter API test completed successfully!")
-    else:
-        print("\n💥 OpenRouter API test failed!")
+        if result["success"]:
+            print("Well, API is working correctly.")
+            if result["content"]:
+                print(f"Response from API: {result['content']}")
+            return 0
+        else:
+            print("Not well. Connection failed.")
+            if result["error_message"]:
+                print(f"Error: {result['error_message']}")
+            if result["status_code"]:
+                print(f"Status code: {result['status_code']}")
+            return 1
+
+    except ConfigurationError as e:
+        print(f"Configuration error: {e}")
+        return 1
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by user.")
+        return 130
+    except Exception as e:
+        print(f"Unexpected error occurred: {e}")
+        return 1
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

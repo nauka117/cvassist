@@ -1,9 +1,9 @@
 [project]
 name = "cvassist"
 version = "0.1.0"
-description = ""
+description = "A CV assistance tool following Clean Architecture principles"
 authors = [
-    {name = "nauka117",email = "v_kozyrev@outlook.com"}
+    {name = "nauka117", email = "v_kozyrev@outlook.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -11,6 +11,9 @@ dependencies = [
     "requests>=2.31.0",
     "python-dotenv>=1.0.0"
 ]
+
+[project.scripts]
+cvassist = "cvassist.main:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"
