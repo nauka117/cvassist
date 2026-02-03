@@ -16,3 +16,8 @@ class ApiService:
         """Test the API connection."""
         config = self._config_provider.get_api_config()
         return self._api_gateway.test_connection(config)
+
+    def send_prompt(self, prompt: str) -> ApiResponse:
+        """Send a prompt to the OpenRouter API and return the model's response."""
+        config = self._config_provider.get_api_config()
+        return self._api_gateway.send_prompt(config, prompt)

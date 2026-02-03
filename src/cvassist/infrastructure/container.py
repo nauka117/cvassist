@@ -2,6 +2,7 @@
 
 from cvassist.application.services.api_service import ApiService
 from cvassist.application.use_cases.test_connection import TestConnectionUseCase
+from cvassist.application.use_cases.send_prompt import SendPromptUseCase
 from cvassist.infrastructure.cli.commands import CliCommands
 from cvassist.infrastructure.config.env_config import EnvConfigProvider
 from cvassist.infrastructure.gateways.openrouter_gateway import OpenRouterGateway
@@ -10,7 +11,7 @@ from cvassist.infrastructure.gateways.openrouter_gateway import OpenRouterGatewa
 def create_application() -> CliCommands:
     """
     Creates and configures the application with all its dependencies.
-    
+
     Returns:
         CliCommands: The configured CLI command handler.
     """

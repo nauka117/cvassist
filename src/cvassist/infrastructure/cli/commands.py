@@ -2,6 +2,7 @@
 
 from typing import Dict, Any
 from cvassist.application.use_cases.test_connection import TestConnectionUseCase
+from cvassist.application.use_cases.send_prompt import SendPromptUseCase
 from cvassist.application.services.api_service import ApiService
 
 
@@ -10,10 +11,15 @@ class CliCommands:
 
     def __init__(self, api_service: ApiService):
         self.test_connection_use_case = TestConnectionUseCase(api_service)
+        self.send_prompt_use_case = SendPromptUseCase(api_service)
 
     def test_connection(self):
         """Handle the test connection command."""
         return self.test_connection_use_case.execute()
+
+    def send_prompt(self, prompt: str):
+        """Handle the send prompt command."""
+        return self.send_prompt_use_case.execute(prompt)
 
 
 def handle_result(result: Dict[str, Any]) -> int:
